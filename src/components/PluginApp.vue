@@ -1,53 +1,44 @@
 <script setup>
-import HDE from '../plugin'
-import { ref, watch } from 'vue'
+// import HDE from '../plugin'
+import axios from 'axios'
+import { ref } from 'vue'
 
-const reader = new FileReader()
+const selectedFile = ref(null)
+const sendFilesArray = async () => {
+  const postUrl = 'https://devtest.helpdeskeddy.com/api/v2/tickets/132/posts/'
+  const postData = { text: 'FROMAXIOS', files: [selectedFile.value, null] }
 
-const fileToUpload = ref(null)
-
-// const logFile = (event) => console.log(event.target.files)
-
-const updateFile = (event) => {
-  fileToUpload.value = event.target.files[0]
-  reader.readAsArrayBuffer(fileToUpload.value)
-
-  console.log('file ->', document.querySelector('#file'))
-}
-
-reader.onload = async () => {
-  const arrayBuffer = reader.result
-
-  const options = {
-    url: 'https://data.tinkoff.ru/remote.php/dav/files/HDE_cloud/testDir/testUploadForm.txt',
-    auth: 'hdeCloud',
-    method: 'PUT',
-    contentType: 'application/octet-stream',
+  const config = {
     headers: {
-      'Content-Length': arrayBuffer.byteLength.toString(),
+      'Content-Type': 'multipart/form-data',
     },
-    data: arrayBuffer,
+    auth: {
+      username: '1aynur1@mail.ru',
+      password: '6d0caa1a-8869-494d-8d50-b076436811cf',
+    },
   }
   try {
-    const { data } = await HDE.request(options)
-    console.log(data)
+    const response = await axios.post(postUrl, postData, config)
+    console.log(response.data)
   } catch (error) {
     console.log(error)
   }
 }
 
-reader.onerror = (error) => {
-  console.error(error)
+const onFileSelected = (event) => {
+  const file = event.target.files[0]
+  selectedFile.value = file
+  console.log('file changed', selectedFile.value)
 }
 
-watch(fileToUpload, (newValue) => console.log(newValue))
+// sendFilesArray()
 </script>
 
 <template>
-  <form id="cloudForm">
+  <form id="cloudForm" prevent>
     <label for="file">В облако </label>
-    <input id="file" type="file" name="file" @change="updateFile($event)" />
-    <button @click.stop="uploadFile()">отправить</button>
+    <input id="file" type="file" name="file" @change="onFileSelected" />
+    <button @click.prevent="sendFilesArray">отправить</button>
   </form>
 </template>
 

@@ -12,6 +12,7 @@
     "saas_dev": "vite build --mode saas_dev"
   },
   "dependencies": {
+    "axios": "^1.4.0",
     "vue": "^3.2.47"
   },
   "devDependencies": {
